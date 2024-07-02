@@ -1,58 +1,52 @@
-//your JS code here. If required.
- const preferencesForm = document.getElementById("preferences-form");
-      const fontsizeInput = document.getElementById("fontsize");
-      const fontcolorInput = document.getElementById("fontcolor");
+// Function to set a cookie
+function setCookie(name, value, days) {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
 
-      // Get saved preferences
-      const fontsize = getCookie("fontsize");
-      const fontcolor = getCookie("fontcolor");
-      if (fontsize) {
-        document.documentElement.style.setProperty("--fontsize", fontsize);
-        fontsizeInput.value = fontsize;
-      }
-      if (fontcolor) {
-        document.documentElement.style.setProperty("--fontcolor", fontcolor);
-        fontcolorInput.value = fontcolor;
-      }
+// Function to get a cookie
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
 
-      // Save preferences on form submit
-      preferencesForm.addEventListener("submit", (e) => {
-        e.preventDefault();
+// Apply saved preferences on page load
+document.addEventListener("DOMContentLoaded", function() {
+  const savedFontSize = getCookie("fontsize");
+  const savedFontColor = getCookie("fontcolor");
 
-        // Set cookies
-        setCookie("fontsize", fontsizeInput.value, 365);
-        setCookie("fontcolor", fontcolorInput.value, 365);
+  if (savedFontSize) {
+    document.documentElement.style.setProperty('--fontsize', savedFontSize + 'px');
+    document.getElementById("fontsize").value = savedFontSize;
+  }
 
-        // Update page styles
-        document.documentElement.style.setProperty(
-          "--fontsize",
-          fontsizeInput.value + "px"
-        );
-        document.documentElement.style.setProperty(
-          "--fontcolor",
-          fontcolorInput.value
-        );
-      });
+  if (savedFontColor) {
+    document.documentElement.style.setProperty('--fontcolor', savedFontColor);
+    document.getElementById("fontcolor").value = savedFontColor;
+  }
+});
 
-      // Functions to set and get cookies
-      function setCookie(name, value, days) {
-        const date = new Date();
-        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-        const expires = "expires=" + date.toUTCString();
-        document.cookie = name + "=" + value + ";" + expires + ";path=/";
-      }
+// Save preferences on form submit
+document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+  event.preventDefault();
 
-      function getCookie(name) {
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const cookies = decodedCookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i];
-          while (cookie.charAt(0) === " ") {
-            cookie = cookie.substring(1);
-          }
-          if (cookie.indexOf(name + "=") === 0) {
-            return cookie.substring(name.length + 1, cookie.length);
-          }
-        }
-        return "";
-      }
+  const fontSize = document.getElementById("fontsize").value;
+  const fontColor = document.getElementById("fontcolor").value;
+
+  document.documentElement.style.setProperty('--fontsize', fontSize + 'px');
+  document.documentElement.style.setProperty('--fontcolor', fontColor);
+
+  setCookie("fontsize", fontSize, 365);
+  setCookie("fontcolor", fontColor, 365);
+});
